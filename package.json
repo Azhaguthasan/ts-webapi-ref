@@ -30,5 +30,13 @@
     "reference"
   ],
   "author": "Das Apparsamy <azhaguthasan@hotmail.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azhaguthasan/ts-webapi-ref.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azhaguthasan/ts-webapi-ref/issues"
+  },
+  "homepage": "https://github.com/Azhaguthasan/ts-webapi-ref#readme"
 }
