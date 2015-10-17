@@ -1,0 +1,43 @@
+.DS_Store
+.sass-cache
+.idea
+node_modules
+dist
+
+#Sublime
+*.sublime-*
+
+# Remove the generated project css file
+src/app/styles/me.css
+
+# Remove generated _references files
+.tmp
+.dist
+
+# Remove bower deps
+typings
+
+bower_components/*
+
+# Ignore the generated js files and only commit the typescript source
+# Careful not to point to the root folder there are several js files needed there
+src/*.js
+src/**/*.map
+src/**/*.js
+src/styles
+src/app/styles/*.css
+
+# This last line might have to be replaced with individual folders if we ever store any js file in the deps folder:
+#app/common/**/*.js
+#app/landing/**/*.js
+
+# And for the tests folder too, ignore the map and js files, check in the .ts files only
+tests/**/*.map
+
+# vscode, sublime, atom, settings ignore
+.settings
+.vscode
+.idea
+
+# ignore changes to tsconfig.
+tsconfig.json
