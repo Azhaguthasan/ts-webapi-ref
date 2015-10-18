@@ -13,12 +13,14 @@ $ npm install ts-webapi-ref
 
 This module has only one api "generateApi"
 
+```
 url: <web api endpoint exposing all the Api descriptions (see below for more details)>
 options: {
      filename: (Reference.ts) "name of the file that should contain the generated types and web api service"
      module: (Service.Reference) "name of the module for the service call interface"
      apiSuffix: (Service) "suffix name of the service interface generated."
 }
+```
 
 ```javascript
 var tsWebApiRef = require("ts-webapi-ref");
