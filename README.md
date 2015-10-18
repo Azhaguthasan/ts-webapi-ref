@@ -3,13 +3,13 @@ A npm module for generating typescript code from Web Api Descriptions
 
 This npm module allows to generate typescript code using the Api Descriptions provided by Web Api. It also generates Services call providing interfaces for each Web Api controller and implements the service call using angular.IHttpService. This module can be included as a gulp task in the build.
 
-###Installation:
+### Installation:
 
 ```
 $ npm install ts-webapi-ref
 ```
 
-###Usage:
+### Usage:
 
 This module has only one api "generateApi"
 
