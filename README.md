@@ -13,6 +13,12 @@ $ npm install ts-webapi-ref
 
 This module has only one api "generateApi"
 
+```javascript
+var tsWebApiRef = require("ts-webapi-ref");
+
+tsWebApiRef.generateApi(url, [options]);
+```
+
 ```
 url: <web api endpoint exposing all the Api descriptions (see below for more details)>
 options: {
@@ -22,11 +28,6 @@ options: {
 }
 ```
 
-```javascript
-var tsWebApiRef = require("ts-webapi-ref");
-
-tsWebApiRef.generateApi(url, [options]);
-```
 
 This is used in conjunction with WebApiExplorerExtensions nuget package in Web Api code. 
 Please see here for more details: https://github.com/Azhaguthasan/WebApiExtensions
