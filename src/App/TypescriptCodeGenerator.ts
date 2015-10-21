@@ -43,8 +43,8 @@ module CodeGenerator.Generator {
 
         private convertToInterfaces() {
             this.types
-                .filter((type: CodeDom.TypeInfo) => {
-                    return this.typescriptTypeMapper.isValidTypeForDerivation(type);
+                .filter((value: CodeDom.TypeInfo) => {
+                    return value.fullName !== null && value.fullName.indexOf("System") === -1;
                 })
                 .forEach((type: CodeDom.TypeInfo) => {
                     type.name = "I" + type.name;
