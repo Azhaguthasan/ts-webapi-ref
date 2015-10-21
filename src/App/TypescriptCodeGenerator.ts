@@ -44,7 +44,7 @@ module CodeGenerator.Generator {
         private convertToInterfaces() {
             this.types.forEach((type: CodeDom.TypeInfo) => {
                     type.name = "I" + type.name;
-                    type.fullName = type.namespace + type.name;                 
+                    type.fullName = type.namespace + "." + type.name;                 
                 });
         }
         
