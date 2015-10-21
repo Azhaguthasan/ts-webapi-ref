@@ -1,4 +1,4 @@
-module CodeGenerator.Generator {    
+module CodeGenerator.Generator {
 
     export class TypescriptCodeGenerator {
         private typescriptTypeMapper: CodeDom.ITypescriptTypeMapper;
@@ -16,7 +16,7 @@ module CodeGenerator.Generator {
         public generateCode(args: Args, apiDescriptions: Array<CodeDom.ApiDescription>) {
 
             var referenceContent = "";
-            
+
             var fileName = args.fileName;
             var apiSuffix = args.apiSuffix;
             var module = args.module;
@@ -26,40 +26,44 @@ module CodeGenerator.Generator {
             apiDescriptions.forEach((api: CodeDom.ApiDescription, index: number, allApis: Array<CodeDom.ApiDescription>): void => {
                 this.populateTypes(api);
             });
-            
-            if (generateTypesAsInterface) {            
+
+            if (generateTypesAsInterface) {
                 this.convertToInterfaces();
             }
-            
+
             referenceContent += this.generateTypes();
 
-            if (!generateOnlyTypes) {            
-                referenceContent += this.generateServices(apiDescriptions, apiSuffix, module);            
+            if (!generateOnlyTypes) {
+                referenceContent += this.generateServices(apiDescriptions, apiSuffix, module);
             }
 
             this.filesystem.writeFileSync(fileName, referenceContent);
 
         }
-        
+
         private convertToInterfaces() {
-            this.types.forEach((type: CodeDom.TypeInfo) => {
+            this.types
+                .filter((type: CodeDom.TypeInfo) => {
+                    return this.typescriptTypeMapper.isValidTypeForDerivation(type);
+                })
+                .forEach((type: CodeDom.TypeInfo) => {
                     type.name = "I" + type.name;
-                    type.fullName = type.namespace + "." + type.name;                 
+                    type.fullName = type.namespace + "." + type.name;
                 });
         }
-        
+
         private generateServices(apiDescriptions: Array<CodeDom.ApiDescription>, apiSuffix: string, module: string): string {
-            
+
             var referenceContent = "";
             var apiGroups = apiDescriptions.groupBy((item: CodeDom.ApiDescription) => {
                 return item.controllerName;
-            });                                                
-                        
-            apiGroups.forEach((group: Array<CodeDom.ApiDescription>, index: number, array: Array<Array<CodeDom.ApiDescription>>) => {                                
+            });
+
+            apiGroups.forEach((group: Array<CodeDom.ApiDescription>, index: number, array: Array<Array<CodeDom.ApiDescription>>) => {
                 referenceContent += this.generateInterface(group, apiSuffix, module);
                 referenceContent += this.generateImplementation(group, apiSuffix, module);
             });
-            
+
             return referenceContent;
         }
 
@@ -69,17 +73,17 @@ module CodeGenerator.Generator {
             this.types.pushRange(responseTypes);
 
             if (apiDescription.parameterDescriptions !== null && apiDescription.parameterDescriptions.hasAny()) {
-                apiDescription.parameterDescriptions.forEach((parameter: CodeDom.ParameterDescription) => {                    
+                apiDescription.parameterDescriptions.forEach((parameter: CodeDom.ParameterDescription) => {
                     var paramterTypes = this.getTypeInfos(parameter.type);
                     this.types.pushRange(paramterTypes);
                 });
-            }            
+            }
         }
-        
+
         private generateTypes(): string {
-            
+
             var typesOutput = "";
-                        
+
             var typeGroups = this.types.groupBy((type: CodeDom.TypeInfo): string => {
                 return type.name;
             });
@@ -136,28 +140,28 @@ module CodeGenerator.Generator {
             interfaceTypeInfo.namespace = module;
             interfaceTypeInfo.name = "I" + firstApi.controllerName + apiSuffix;
             interfaceTypeInfo.fullName = module + "." + interfaceTypeInfo.name;
-            interfaceTypeInfo.methods = new Array<CodeDom.MethodInfo>();           
-                                
+            interfaceTypeInfo.methods = new Array<CodeDom.MethodInfo>();
+
             apiDescriptions.forEach((api: CodeDom.ApiDescription) => {
                 var methodInfo = new CodeDom.MethodInfo();
                 methodInfo.name = api.actionName;
                 methodInfo.parameters = api.parameterDescriptions;
-                
+
                 var returnType = new CodeDom.TypeInfo();
-                returnType.typeArguments = new Array<CodeDom.TypeInfo>();    
+                returnType.typeArguments = new Array<CodeDom.TypeInfo>();
                 returnType.typeArguments.push(api.responseType);
                 returnType.name = "IPromise";
                 returnType.namespace = "angular";
                 returnType.fullName = returnType.namespace + "." + returnType.name;
-                
-                methodInfo.returnType = returnType;    
+
+                methodInfo.returnType = returnType;
                 interfaceTypeInfo.methods.push(methodInfo);
-            });            
-                                    
+            });
+
             return this.typescriptTypeGenerator.generateType(interfaceTypeInfo);
         }
-        
-         private generateImplementation(apiDescriptions: Array<CodeDom.ApiDescription>, apiSuffix: string, module: string): string {
+
+        private generateImplementation(apiDescriptions: Array<CodeDom.ApiDescription>, apiSuffix: string, module: string): string {
 
             var implementationTypeInfo = new CodeDom.TypeInfo();
 
@@ -176,54 +180,54 @@ module CodeGenerator.Generator {
             httpServiceInfo.type = new CodeDom.TypeInfo();
             httpServiceInfo.type.name = "IHttpService";
             httpServiceInfo.type.namespace = "angular";
-            httpServiceInfo.type.fullName = httpServiceInfo.type.namespace + "." + httpServiceInfo.type.name;            
-            constructorInfo.parameters.push(httpServiceInfo);            
-            
+            httpServiceInfo.type.fullName = httpServiceInfo.type.namespace + "." + httpServiceInfo.type.name;
+            constructorInfo.parameters.push(httpServiceInfo);
+
             implementationTypeInfo.methods.push(constructorInfo);
-            
+
             apiDescriptions.forEach((api: CodeDom.ApiDescription) => {
                 var methodInfo = new CodeDom.MethodInfo();
                 methodInfo.name = api.actionName;
                 methodInfo.parameters = api.parameterDescriptions;
 
                 var returnType = new CodeDom.TypeInfo();
-                returnType.typeArguments = new Array<CodeDom.TypeInfo>();    
+                returnType.typeArguments = new Array<CodeDom.TypeInfo>();
                 returnType.typeArguments.push(api.responseType);
                 returnType.name = "IPromise";
-                returnType.namespace = "angular";                
+                returnType.namespace = "angular";
                 returnType.fullName = returnType.namespace + "." + returnType.name;
                 methodInfo.returnType = returnType;
-                    
+
                 methodInfo.statements = this.getStatements(api);
-                
+
                 implementationTypeInfo.methods.push(methodInfo);
-            });           
-            
+            });
+
             return this.typescriptTypeGenerator.generateType(implementationTypeInfo);
         }
-        
+
         private getStatements(api: CodeDom.ApiDescription): Array<string> {
             var statements = new Array<string>();
-            
+
             statements.push("var httpServiceRequest = {");
             statements.push("\tmethod: \"" + api.httpMethod + "\",");
             statements.push("\turl: \"" + api.relativePath + "\",");
             statements.push("\tdata: {");
             api.parameterDescriptions.forEach((parameter: CodeDom.ParameterDescription) => {
-                statements.push("\t\t" + parameter.name + ": " + parameter.name + "," )
+                statements.push("\t\t" + parameter.name + ": " + parameter.name + ",")
             })
             statements.push("\t}");
             statements.push("};")
-            
+
             statements.push("var promise = this.$httpService(httpServiceRequest)");
             statements.push("\t.then((httpServiceResponse: angular.IHttpPromiseCallbackArg<" + this.typescriptTypeMapper.getTypeOutput(api.responseType) + ">) => {");
             statements.push("\t\treturn httpServiceResponse.data;");
             statements.push("\t});");
             statements.push("return promise;")
-            
+
             return statements;
         }
-        
+
     }
 
 
