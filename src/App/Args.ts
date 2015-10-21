@@ -3,6 +3,8 @@ module CodeGenerator {
         apiSuffix: string = "Service";
         module: string = "Service.Reference";
         fileName: string = "Reference.ts";
+        generateOnlyTypes: boolean = false;
+        generateTypesAsInterface: boolean = false; 
 
         constructor(options: any) {
 
@@ -18,6 +20,14 @@ module CodeGenerator {
 
                 if (options.fileName) {
                     this.fileName = options.fileName;
+                }
+                
+                if (options.generateOnlyTypes) {
+                    this.generateOnlyTypes = options.generateOnlyTypes;
+                }                
+                
+                if (options.generateTypesAsInterface) {
+                    this.generateTypesAsInterface = options.generateTypesAsInterface;
                 }
             }
         }

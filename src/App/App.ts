@@ -22,7 +22,7 @@ module CodeGenerator {
             var apiReader = new CodeGenerator.ApiReader();
             apiReader.getApi(url)
                 .then((apiDescrptions: Array<CodeGenerator.CodeDom.ApiDescription>) => {
-                    this.codeGenerator.generateCode(args.fileName, apiDescrptions, args.apiSuffix, args.module);
+                    this.codeGenerator.generateCode(args, apiDescrptions);
                 });
         }
     }

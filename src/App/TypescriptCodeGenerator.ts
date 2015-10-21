@@ -13,27 +13,54 @@ module CodeGenerator.Generator {
             this.types = new Array<CodeDom.TypeInfo>();
         }
 
-        public generateCode(fileName: string, apiDescriptions: Array<CodeDom.ApiDescription>, apiSuffix: string, module: string) {
+        public generateCode(args: Args, apiDescriptions: Array<CodeDom.ApiDescription>) {
 
             var referenceContent = "";
+            
+            var fileName = args.fileName;
+            var apiSuffix = args.apiSuffix;
+            var module = args.module;
+            var generateOnlyTypes = args.generateOnlyTypes;
+            var generateTypesAsInterface = args.generateTypesAsInterface;
 
             apiDescriptions.forEach((api: CodeDom.ApiDescription, index: number, allApis: Array<CodeDom.ApiDescription>): void => {
                 this.populateTypes(api);
             });
             
+            if (generateTypesAsInterface) {            
+                this.convertToInterfaces();
+            }
+            
             referenceContent += this.generateTypes();
 
+            if (!generateOnlyTypes) {            
+                referenceContent += this.generateServices(apiDescriptions, apiSuffix, module);            
+            }
+
+            this.filesystem.writeFileSync(fileName, referenceContent);
+
+        }
+        
+        private convertToInterfaces() {
+            this.types.forEach((type: CodeDom.TypeInfo) => {
+                    type.name = "I" + type.name;
+                    type.fullName = type.namespace + type.name;                 
+                });
+        }
+        
+        private generateServices(apiDescriptions: Array<CodeDom.ApiDescription>, apiSuffix: string, module: string): string {
+            
+            var referenceContent = "";
             var apiGroups = apiDescriptions.groupBy((item: CodeDom.ApiDescription) => {
                 return item.controllerName;
-            });
+            });                                                
                         
             apiGroups.forEach((group: Array<CodeDom.ApiDescription>, index: number, array: Array<Array<CodeDom.ApiDescription>>) => {                                
                 referenceContent += this.generateInterface(group, apiSuffix, module);
                 referenceContent += this.generateImplementation(group, apiSuffix, module);
             });
-
-            this.filesystem.writeFileSync(fileName, referenceContent);
-
+            
+            return referenceContent;
         }
 
         private populateTypes(apiDescription: CodeDom.ApiDescription): void {

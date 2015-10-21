@@ -16,15 +16,17 @@ This module has only one api "generateApi"
 ```javascript
 var tsWebApiRef = require("ts-webapi-ref");
 
-tsWebApiRef.generateApi(url, [options]);
+tsWebApiRef.generateApi(url [, options]);
 ```
 
 ```
 url: <web api endpoint exposing all the Api descriptions (see below for more details)>
-options: {
+options: {    
      filename: (Reference.ts) "name of the file that should contain the generated types and web api service"
      module: (Service.Reference) "name of the module for the service call interface"
      apiSuffix: (Service) "suffix name of the service interface generated."
+     generateOnlyTypes: (false) "if enabled, generator will not generate service api calls"
+     generateTypesAsInterfaces: (false) "if enabled, generator will generate the types as interfaces"
 }
 ```
 
