@@ -44,7 +44,7 @@ module CodeGenerator.Generator {
         private convertToInterfaces() {
             this.types
                 .filter((value: CodeDom.TypeInfo) => {
-                    return value.fullName !== null && value.fullName.indexOf("System") === -1;
+                    return value.fullName !== null && value.fullName.indexOf("System") === -1 && !value.isEnum;
                 })
                 .forEach((type: CodeDom.TypeInfo) => {
                     type.name = "I" + type.name;
