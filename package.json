@@ -1,6 +1,6 @@
 {
   "name": "ts-webapi-ref",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "devDependencies": {
     "del": "^2.0.2",
     "gulp": "^3.9.0",
