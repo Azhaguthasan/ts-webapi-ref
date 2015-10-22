@@ -1,12 +1,11 @@
 ﻿module CodeGenerator.CodeDom {
 
-    export class TypescriptTypeMapper implements ITypescriptTypeMapper
-    {
+    export class TypescriptTypeMapper implements ITypescriptTypeMapper {
         private typeMap: any;
         private baseTypeRegex: RegExp = /(([a-zA-Z]+[0-9.]*)+)/;
         private arrayRegex = /^([a-zA-Z0-9\.]+)(?:[`0-9]*)\[((?:\]\[)*|(?:,)*)\]$/;
 
-        constructor() {            
+        constructor() {
             this.typeMap = {};
             this.addAllKnownTypes();
         }
@@ -37,7 +36,7 @@
         }
 
         public isValidTypeForDerivation(type: CodeGenerator.CodeDom.TypeInfo): boolean {
-            return type.fullName !== "System.Object";
+            return type.fullName !== "System.Object" && type.fullName !== "System.ValueType";
         }
 
         public isCollectionType(type: CodeGenerator.CodeDom.TypeInfo): boolean {
@@ -53,35 +52,36 @@
         private getActualTypeName(type: CodeGenerator.CodeDom.TypeInfo): string {
             var matchResult = this.baseTypeRegex.exec(type.fullName);
 
-            if (matchResult === null || matchResult.length === 0) {
+            if (!matchResult || matchResult.length === 0) {
                 throw new Error("Type mismatch");
             }
 
             return matchResult[0];
         }
-        
+
         public getTypeOutput(type: CodeGenerator.CodeDom.TypeInfo): string {
-                   
+
             var baseTypeName = this.getActualTypeName(type);
 
             var typeOutputString: string;
-            
+
             var nullable = /nullable/i;
 
             if (nullable.test(baseTypeName)) {
                 typeOutputString = this.getTypeArgument(type);
             }
-            else {               
+            else {
+
+                typeOutputString = this.translateType(baseTypeName);
                 
-                typeOutputString = this.translateType(baseTypeName);            
-                
-                if (type.typeArguments !== undefined && type.typeArguments.length > 0)
+                if (type.typeArguments && type.typeArguments.hasAny()) {
                     typeOutputString = this.addTypeArguments(type, typeOutputString);
+                }
             }
-                        
+
 
             if (this.arrayRegex.test(type.name))
-                typeOutputString = this.getArrayType(type.name, typeOutputString);  
+                typeOutputString = this.getArrayType(type.name, typeOutputString);
 
             return typeOutputString;
         }
@@ -98,7 +98,9 @@
 
         private getTypeArgument(type: CodeGenerator.CodeDom.TypeInfo): string {
             var typeArguments = type.typeArguments
-                .map(this.getTypeOutput);
+                .map((typeArgument: CodeDom.TypeInfo) => {
+                    return this.getTypeOutput(typeArgument);
+                });
 
             return typeArguments.join(", ");
         }
@@ -125,7 +127,7 @@
         }
 
         private getArrayString(baseType: string, count: number): string {
-            return count === 0 ? baseType : "Array<" + this.getArrayString(baseType, count-1)+ ">";
+            return count === 0 ? baseType : "Array<" + this.getArrayString(baseType, count - 1) + ">";
         }
     }
 }

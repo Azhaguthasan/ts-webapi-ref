@@ -22,7 +22,11 @@ module CodeGenerator {
             var apiReader = new CodeGenerator.ApiReader();
             apiReader.getApi(url)
                 .then((apiDescrptions: Array<CodeGenerator.CodeDom.ApiDescription>) => {
-                    this.codeGenerator.generateCode(args, apiDescrptions);
+                    try {
+                        this.codeGenerator.generateCode(args, apiDescrptions);
+                    } catch (error) {
+                        console.log(error, error.stack.split("\n"));                        
+                    }
                 });
         }
     }

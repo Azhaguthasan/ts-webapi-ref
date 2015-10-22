@@ -47,7 +47,7 @@ module CodeGenerator.Generator {
                     return value.fullName !== null && value.fullName.indexOf("System") === -1 && !value.isEnum;
                 })
                 .forEach((type: CodeDom.TypeInfo) => {
-                    type.isInterface = true; 
+                    type.isInterface = true;
                     type.name = "I" + type.name;
                     type.fullName = type.namespace + "." + type.name;
                 });
@@ -94,10 +94,10 @@ module CodeGenerator.Generator {
                     return group.first();
                 })
                 .filter((value: CodeDom.TypeInfo) => {
-                    return value.fullName !== null && value.fullName.indexOf("System") === -1;
+                    return value.fullName && value.fullName.indexOf("System") === -1;
                 });
 
-            if (uniqueTypes !== null && uniqueTypes.hasAny()) {
+            if (uniqueTypes && uniqueTypes.hasAny()) {
                 uniqueTypes.forEach((type: CodeDom.TypeInfo) => {
                     var typeString = this.typescriptTypeGenerator.generateType(type);
                     typesOutput += typeString;
@@ -111,19 +111,24 @@ module CodeGenerator.Generator {
 
             var types = new Array<CodeDom.TypeInfo>();
 
-            if (typeInfo === null)
+            if (!typeInfo)
                 return types;
 
             types.push(typeInfo);
 
-            if (typeInfo.typeArguments !== null && typeInfo.typeArguments.hasAny()) {
+            if (typeInfo.baseType) {                
+                var baseTypeDependentTypes = this.getTypeInfos(typeInfo.baseType);
+                types.pushRange(baseTypeDependentTypes);
+            }
+
+            if (typeInfo.typeArguments && typeInfo.typeArguments.hasAny()) {
                 typeInfo.typeArguments.forEach((typeArgument: CodeDom.TypeInfo) => {
                     var typeArgumentDependentTypes = this.getTypeInfos(typeArgument);
                     types.pushRange(typeArgumentDependentTypes);
                 });
             }
 
-            if (typeInfo.properties !== null && typeInfo.properties.hasAny()) {
+            if (typeInfo.properties && typeInfo.properties.hasAny()) {
                 typeInfo.properties.forEach((property: CodeDom.PropertyInfo) => {
                     var propertyDependentTypes = this.getTypeInfos(property.type);
                     types.pushRange(propertyDependentTypes);
@@ -140,6 +145,7 @@ module CodeGenerator.Generator {
             var firstApi = apiDescriptions.first();
             interfaceTypeInfo.namespace = module;
             interfaceTypeInfo.name = "I" + firstApi.controllerName + apiSuffix;
+            interfaceTypeInfo.isInterface = true;
             interfaceTypeInfo.fullName = module + "." + interfaceTypeInfo.name;
             interfaceTypeInfo.methods = new Array<CodeDom.MethodInfo>();
 
@@ -150,7 +156,17 @@ module CodeGenerator.Generator {
 
                 var returnType = new CodeDom.TypeInfo();
                 returnType.typeArguments = new Array<CodeDom.TypeInfo>();
-                returnType.typeArguments.push(api.responseType);
+                
+                if (api.responseType) {                
+                    returnType.typeArguments.push(api.responseType);
+                } else {
+                    var anyType = new CodeDom.TypeInfo;
+                    anyType.name = "Object";
+                    anyType.namespace = "System";
+                    anyType.fullName = anyType.namespace + "." + anyType.name;
+                    returnType.typeArguments.push(anyType);
+                }
+                
                 returnType.name = "IPromise";
                 returnType.namespace = "angular";
                 returnType.fullName = returnType.namespace + "." + returnType.name;
@@ -193,7 +209,17 @@ module CodeGenerator.Generator {
 
                 var returnType = new CodeDom.TypeInfo();
                 returnType.typeArguments = new Array<CodeDom.TypeInfo>();
-                returnType.typeArguments.push(api.responseType);
+                
+                if (api.responseType) {                
+                    returnType.typeArguments.push(api.responseType);
+                } else {
+                    var anyType = new CodeDom.TypeInfo;
+                    anyType.name = "Object";
+                    anyType.namespace = "System";
+                    anyType.fullName = anyType.namespace + "." + anyType.name;
+                    returnType.typeArguments.push(anyType);
+                }
+                 
                 returnType.name = "IPromise";
                 returnType.namespace = "angular";
                 returnType.fullName = returnType.namespace + "." + returnType.name;
@@ -221,7 +247,13 @@ module CodeGenerator.Generator {
             statements.push("};")
 
             statements.push("var promise = this.$httpService(httpServiceRequest)");
-            statements.push("\t.then((httpServiceResponse: angular.IHttpPromiseCallbackArg<" + this.typescriptTypeMapper.getTypeOutput(api.responseType) + ">) => {");
+            
+            if (api.responseType) {
+                statements.push("\t.then((httpServiceResponse: angular.IHttpPromiseCallbackArg<" + this.typescriptTypeMapper.getTypeOutput(api.responseType) + ">) => {");
+            } else {
+                statements.push("\t.then((httpServiceResponse: angular.IHttpPromiseCallbackArg<any>) => {");
+            }
+            
             statements.push("\t\treturn httpServiceResponse.data;");
             statements.push("\t});");
             statements.push("return promise;")

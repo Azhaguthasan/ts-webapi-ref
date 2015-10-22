@@ -20,18 +20,18 @@ module CodeGenerator {
             if (!this.endPointRegex.test(uri))
                 throw new Error("Check url!!");
 
-            var result = this.endPointRegex.exec(uri);
+            var urlMatchResult = this.endPointRegex.exec(uri);
             
-            var isHttps = result[1] === "https";
+            var isHttps = urlMatchResult[1] === "https";
 
             var options = {
                 rejectUnauthorized: false,
-                host: result[2],
-                port: result[3],
-                path: result[4],
+                host: urlMatchResult[2],
+                port: urlMatchResult[3],
+                path: urlMatchResult[4],
                 method: "GET"
             };
-
+            
             var httpCall = isHttps ? this.https.get : this.http.get;
             
             httpCall(options, (response: any) => {

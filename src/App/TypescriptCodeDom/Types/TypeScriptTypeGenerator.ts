@@ -24,28 +24,28 @@
 
         public generateType(typeInfo: CodeGenerator.CodeDom.TypeInfo): string {
             var typeString = this.getType(typeInfo);
-            var hasNamespace = typeInfo.namespace !== undefined && typeInfo.namespace.length > 0;
+            var hasNamespace = typeInfo.namespace && typeInfo.namespace.length > 0;
             return hasNamespace ? this.wrapWithModule(typeInfo, typeString) : typeString;
         }
 
         private getType(typeInfo: CodeGenerator.CodeDom.TypeInfo): string {
 
-            var hasNamespace = typeInfo.namespace !== undefined && typeInfo.namespace.length > 0;
+            var hasNamespace = typeInfo.namespace && typeInfo.namespace.length > 0;
             var indentLevel = hasNamespace ? 1 : 0;
             var accessModifier = hasNamespace ? "export " : "";
             var typeName = typeInfo.name;
-            var typeOfType = this.getTypeOfType(typeInfo);                       
+            var typeOfType = this.getTypeOfType(typeInfo);                                               
             
             var membersCollections= "";
-            if (typeInfo.properties != null && typeInfo.properties.hasAny()) {
+            if (typeInfo.properties && typeInfo.properties.hasAny()) {
                 var members = typeInfo.properties.map((property: CodeGenerator.CodeDom.PropertyInfo) => {
                     return this.typescriptMemberGenerator.generateMember(property);
                 });
                 membersCollections = this.os.EOL + this.getIndentTabs(indentLevel + 1) + members.join(this.os.EOL + this.getIndentTabs(indentLevel + 1)) + this.os.EOL;
-            }
+            }                       
             
             var methodsCollections = "";
-            if (typeInfo.methods != null && typeInfo.methods.hasAny()) {
+            if (typeInfo.methods && typeInfo.methods.hasAny()) {
                 var methods = typeInfo.methods.map((method: CodeGenerator.CodeDom.MethodInfo) => {
                     return this.typescriptMemberGenerator.generateMethod(method, indentLevel + 1);
                 });                
@@ -53,7 +53,7 @@
             }                        
             
             var typeParametersExpression = "";
-            if (typeInfo.typeArguments != null && typeInfo.typeArguments.hasAny()) {
+            if (typeInfo.typeArguments && typeInfo.typeArguments.hasAny()) {
                 var typeParameters = typeInfo.typeArguments.map(parameter => this.typescriptTypeParameter.generateParameter(parameter));
                 if (typeParameters.hasAny()) {
                     typeParametersExpression = "<" + typeParameters.join(", ") + ">";
@@ -62,7 +62,7 @@
             
             var baseTypeExpression = "";
 
-            if (!typeInfo.isEnum && typeInfo.baseType !== undefined) {
+            if (!typeInfo.isEnum && typeInfo.baseType) {
                 if (this.typescriptTypeMapper.isValidTypeForDerivation(typeInfo.baseType)) {
                     baseTypeExpression = " extends " + this.typescriptTypeMapper.getTypeOutput(typeInfo.baseType);
                 } 

@@ -20,25 +20,25 @@
 
             if (property.isEnumMember)
                 return camelCaseName + " = " + property.enumValue + ",";
-
+            
             return camelCaseName + ": " + this.typescriptTypeMapper.getTypeOutput(property.type) + ";";
         }
 
         public generateMethod(method: CodeGenerator.CodeDom.MethodInfo, indentLevel: number): string {
 
             var camelCaseName = this.convertPascalCaseToCamelCase(method.name);
-            
+                        
             var parametersCollection = "";                       
-            if (method.parameters !== undefined && method.parameters.hasAny()) {
+            if (method.parameters && method.parameters.hasAny()) {
                 var parameters = method.parameters.map((parameter: ParameterDescription) => {
                     return this.generateParameter(parameter);
                 });
                 parametersCollection = parameters.join(", ");
             }
-                                                        
-            var returnType = method.returnType === undefined ? "void" : this.typescriptTypeMapper.getTypeOutput(method.returnType);            
+                                                                    
+            var returnType = !method.returnType ? "void" : this.typescriptTypeMapper.getTypeOutput(method.returnType);
             
-            if (method.statements !== undefined && method.statements.hasAny()) {
+            if (method.statements && method.statements.hasAny()) {
                 var tabs = this.getIndentTabs(indentLevel+1);
                 var tabsAfter = this.getIndentTabs(indentLevel);
                 var statementsCollection = method.statements.join(this.os.EOL + tabs);
@@ -68,7 +68,7 @@
         }
 
         public convertPascalCaseToCamelCase(name: string): string {
-            if (name === null || name.length <= 0)
+            if (!name || name.length <= 0)
                 return "";
 
             var firstChar = name[0].toString().toLowerCase();
