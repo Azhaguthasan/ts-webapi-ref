@@ -26,7 +26,7 @@ options: {
      module: (Service.Reference) "name of the module for the service call interface"
      apiSuffix: (Service) "suffix name of the service interface generated."
      generateOnlyTypes: (false) "if enabled, generator will not generate service api calls"
-     generateTypesAsInterfaces: (false) "if enabled, generator will generate the types as interfaces"
+     generateTypesAsInterface: (false) "if enabled, generator will generate the types as interfaces"
 }
 ```
 
