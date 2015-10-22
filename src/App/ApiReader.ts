@@ -25,6 +25,7 @@ module CodeGenerator {
             var isHttps = result[1] === "https";
 
             var options = {
+                rejectUnauthorized: false,
                 host: result[2],
                 port: result[3],
                 path: result[4],
