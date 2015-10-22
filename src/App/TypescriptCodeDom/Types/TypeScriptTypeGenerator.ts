@@ -87,7 +87,11 @@
         }
 
         private getTypeOfType(typeInfo: CodeGenerator.CodeDom.TypeInfo): string {
-            return typeInfo.isEnum ? "enum " : "class ";
+            return typeInfo.isEnum 
+                ? "enum " 
+                : typeInfo.isInterface 
+                    ? "interface "  
+                    : "class ";
         }
 
         private wrapWithModule(typeInfo: CodeGenerator.CodeDom.TypeInfo, typeString: string): string {

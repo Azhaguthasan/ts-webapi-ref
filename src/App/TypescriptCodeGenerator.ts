@@ -47,6 +47,7 @@ module CodeGenerator.Generator {
                     return value.fullName !== null && value.fullName.indexOf("System") === -1 && !value.isEnum;
                 })
                 .forEach((type: CodeDom.TypeInfo) => {
+                    type.isInterface = true; 
                     type.name = "I" + type.name;
                     type.fullName = type.namespace + "." + type.name;
                 });
