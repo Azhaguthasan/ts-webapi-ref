@@ -217,6 +217,7 @@ module CodeGenerator.Generator {
             staticMemberInfo.hasValue = true;
             staticMemberInfo.value = "[ \"$httpService\" ]";
             
+            implementationTypeInfo.properties.push(staticMemberInfo);
 
             var constructorInfo = new CodeDom.MethodInfo();
             constructorInfo.name = "constructor";
