@@ -217,6 +217,10 @@ module CodeGenerator.Generator {
             staticMemberInfo.name = "static $inject";
             staticMemberInfo.hasValue = true;
             staticMemberInfo.value = "[ \"$httpService\" ]";
+            staticMemberInfo.type = new CodeDom.TypeInfo;
+            staticMemberInfo.type.name = "Object";
+            staticMemberInfo.type.namespace = "System";
+            staticMemberInfo.type.fullName = staticMemberInfo.type.namespace + "." + staticMemberInfo.type.name;            
             
             implementationTypeInfo.properties.push(staticMemberInfo);
 

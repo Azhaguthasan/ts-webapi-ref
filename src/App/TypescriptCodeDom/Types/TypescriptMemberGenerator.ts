@@ -27,7 +27,8 @@
                     + ": " 
                     + this.typescriptTypeMapper.getTypeOutput(property.type) 
                     + " = "
-                    + property.value;                    
+                    + property.value
+                    + ";";                    
             }
             
             return camelCaseName + ": " + this.typescriptTypeMapper.getTypeOutput(property.type) + ";";
