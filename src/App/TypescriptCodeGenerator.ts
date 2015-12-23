@@ -211,6 +211,7 @@ module CodeGenerator.Generator {
             implementationTypeInfo.name = firstApi.controllerName + apiSuffix;
             implementationTypeInfo.fullName = module + "." + implementationTypeInfo.name;
             implementationTypeInfo.methods = new Array<CodeDom.MethodInfo>();
+            implementationTypeInfo.properties = new Array<CodeDom.PropertyInfo>();
             
             var staticMemberInfo = new CodeDom.PropertyInfo();
             staticMemberInfo.name = "static $inject";
