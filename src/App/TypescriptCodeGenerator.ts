@@ -211,6 +211,12 @@ module CodeGenerator.Generator {
             implementationTypeInfo.name = firstApi.controllerName + apiSuffix;
             implementationTypeInfo.fullName = module + "." + implementationTypeInfo.name;
             implementationTypeInfo.methods = new Array<CodeDom.MethodInfo>();
+            
+            var staticMemberInfo = new CodeDom.PropertyInfo();
+            staticMemberInfo.name = "static $inject";
+            staticMemberInfo.hasValue = true;
+            staticMemberInfo.value = "[ \"$httpService\" ]";
+            
 
             var constructorInfo = new CodeDom.MethodInfo();
             constructorInfo.name = "constructor";

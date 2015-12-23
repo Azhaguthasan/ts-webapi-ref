@@ -4,5 +4,7 @@ module CodeGenerator.CodeDom {
         type: CodeGenerator.CodeDom.TypeInfo;
         isEnumMember: boolean;
         enumValue: number;
+        hasValue: boolean;
+        value: string;
     }
 }

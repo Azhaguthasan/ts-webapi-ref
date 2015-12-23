@@ -18,8 +18,17 @@
 
             var camelCaseName = this.convertPascalCaseToCamelCase(property.name);
 
-            if (property.isEnumMember)
+            if (property.isEnumMember) {
                 return camelCaseName + " = " + property.enumValue + ",";
+            }
+                
+            if (property.hasValue) {
+                return camelCaseName 
+                    + ": " 
+                    + this.typescriptTypeMapper.getTypeOutput(property.type) 
+                    + " = "
+                    + property.value;                    
+            }
             
             return camelCaseName + ": " + this.typescriptTypeMapper.getTypeOutput(property.type) + ";";
         }
