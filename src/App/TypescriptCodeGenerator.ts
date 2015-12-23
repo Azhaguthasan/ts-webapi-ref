@@ -4,12 +4,16 @@ module CodeGenerator.Generator {
         private typescriptTypeMapper: CodeDom.ITypescriptTypeMapper;
         private typescriptTypeGenerator: CodeDom.ITypescriptTypeGenerator;
         private filesystem: any;
+        private path: any;
+        private wrench: any;
         private types: Array<CodeDom.TypeInfo>;
 
         constructor(typescriptTypeGenerator: CodeDom.ITypescriptTypeGenerator, typescriptTypeMapper: CodeDom.ITypescriptTypeMapper) {
             this.typescriptTypeMapper = typescriptTypeMapper;
             this.typescriptTypeGenerator = typescriptTypeGenerator;
             this.filesystem = require("fs");
+            this.path = require("path");
+            this.wrench = require("wrench");
             this.types = new Array<CodeDom.TypeInfo>();
         }
 
@@ -22,6 +26,7 @@ module CodeGenerator.Generator {
             var module = args.module;
             var generateOnlyTypes = args.generateOnlyTypes;
             var generateTypesAsInterface = args.generateTypesAsInterface;
+            var generateTypesInSameModule = args.generateTypesInSameModule;            
 
             apiDescriptions.forEach((api: CodeDom.ApiDescription, index: number, allApis: Array<CodeDom.ApiDescription>): void => {
                 this.populateTypes(api);
@@ -30,13 +35,21 @@ module CodeGenerator.Generator {
             if (generateTypesAsInterface) {
                 this.convertToInterfaces();
             }
+            
+            if (generateTypesInSameModule) {
+                this.changeTypesToLocalNamespace(module);
+            }
 
             referenceContent += this.generateTypes();
 
             if (!generateOnlyTypes) {
                 referenceContent += this.generateServices(apiDescriptions, apiSuffix, module);
             }
-
+            
+            var dirName = this.path.dirname(fileName);
+            if (dirName && dirName !== "") {
+                this.wrench.mkdirSyncRecursive(dirName);
+            }
             this.filesystem.writeFileSync(fileName, referenceContent);
 
         }
@@ -49,6 +62,17 @@ module CodeGenerator.Generator {
                 .forEach((type: CodeDom.TypeInfo) => {
                     type.isInterface = true;
                     type.name = "I" + type.name;
+                    type.fullName = type.namespace + "." + type.name;
+                });
+        }
+        
+        private changeTypesToLocalNamespace(module: string) {
+            this.types
+                .filter((value: CodeDom.TypeInfo) => {
+                    return value.fullName !== null && value.fullName.indexOf("System") === -1;
+                })
+                .forEach((type: CodeDom.TypeInfo) => {
+                    type.namespace = module;
                     type.fullName = type.namespace + "." + type.name;
                 });
         }

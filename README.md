@@ -27,6 +27,7 @@ options: {
      apiSuffix: (Service) "suffix name of the service interface generated."
      generateOnlyTypes: (false) "if enabled, generator will not generate service api calls"
      generateTypesAsInterface: (false) "if enabled, generator will generate the types as interfaces"
+     generateTypesInSameModule: (false) "if enabled, the types are generated under provided module"
 }
 ```
 

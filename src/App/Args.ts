@@ -4,7 +4,8 @@ module CodeGenerator {
         module: string = "Service.Reference";
         fileName: string = "Reference.ts";
         generateOnlyTypes: boolean = false;
-        generateTypesAsInterface: boolean = false; 
+        generateTypesAsInterface: boolean = false;
+        generateTypesInSameModule: boolean = false; 
 
         constructor(options: any) {
 
@@ -28,6 +29,10 @@ module CodeGenerator {
                 
                 if (options.generateTypesAsInterface) {
                     this.generateTypesAsInterface = options.generateTypesAsInterface;
+                }
+                
+                if (options.generateTypesInSameModule) {
+                    this.generateTypesInSameModule = options.generateTypesInSameModule;
                 }
             }
         }

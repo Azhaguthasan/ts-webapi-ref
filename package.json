@@ -18,7 +18,8 @@
     "yargs": "^3.27.0"
   },
   "dependencies": {
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "wrench": "^1.5.8"
   },
   "description": "Generates typescript types from web api reference.",
   "main": "index.js",

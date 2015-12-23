@@ -32,6 +32,7 @@
             this.typeMap["System.Collections.Generic.IList"] = "Array";
             this.typeMap["System.Collections.Generic.IEnumerable"] = "Array";
             this.typeMap["System.Collections.IEnumerable"] = "Array";
+            this.typeMap["System.Linq.IQueryable"] = "Array";
             this.typeMap["System.Array"] = "Array";
         }
 
@@ -46,6 +47,7 @@
                 || baseTypeName === "System.Collections.Generic.IList"
                 || baseTypeName === "System.Collections.Generic.IEnumerable"
                 || baseTypeName === "System.Collections.IEnumerable"
+                || baseTypeName === "System.Linq.IQueryable"
                 || baseTypeName === "System.Array";
         }
 
