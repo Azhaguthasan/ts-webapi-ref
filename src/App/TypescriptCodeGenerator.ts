@@ -57,7 +57,7 @@ module CodeGenerator.Generator {
         private convertToInterfaces() {
             this.types
                 .filter((value: CodeDom.TypeInfo) => {
-                    return value.fullName !== null && value.fullName.indexOf("System") === -1 && !value.isEnum;
+                    return value.fullName && value.fullName.indexOf("System") === -1 && !value.isEnum;
                 })
                 .forEach((type: CodeDom.TypeInfo) => {
                     type.isInterface = true;
@@ -69,7 +69,7 @@ module CodeGenerator.Generator {
         private changeTypesToLocalNamespace(module: string) {
             this.types
                 .filter((value: CodeDom.TypeInfo) => {
-                    return value.fullName !== null && value.fullName.indexOf("System") === -1;
+                    return value.fullName && value.fullName.indexOf("System") === -1;
                 })
                 .forEach((type: CodeDom.TypeInfo) => {
                     type.namespace = module;
@@ -97,7 +97,7 @@ module CodeGenerator.Generator {
             var responseTypes = this.getTypeInfos(apiDescription.responseType);
             this.types.pushRange(responseTypes);
 
-            if (apiDescription.parameterDescriptions !== null && apiDescription.parameterDescriptions.hasAny()) {
+            if (apiDescription.parameterDescriptions && apiDescription.parameterDescriptions.hasAny()) {
                 apiDescription.parameterDescriptions.forEach((parameter: CodeDom.ParameterDescription) => {
                     var paramterTypes = this.getTypeInfos(parameter.type);
                     this.types.pushRange(paramterTypes);
@@ -116,6 +116,9 @@ module CodeGenerator.Generator {
             var uniqueTypes = typeGroups
                 .map((group: Array<CodeDom.TypeInfo>): CodeDom.TypeInfo => {
                     return group.first();
+                })
+                .filter((value: CodeDom.TypeInfo) => {
+                    return !value.isArray;                    
                 })
                 .filter((value: CodeDom.TypeInfo) => {
                     return value.fullName && value.fullName.indexOf("System") === -1;
@@ -139,6 +142,12 @@ module CodeGenerator.Generator {
                 return types;
 
             types.push(typeInfo);
+            
+            if (typeInfo.isArray) {
+                var arrayElementType = this.getTypeInfos(typeInfo.arrayElementType);
+                types.pushRange(arrayElementType);
+                return types; 
+            }            
 
             if (typeInfo.baseType) {                
                 var baseTypeDependentTypes = this.getTypeInfos(typeInfo.baseType);
@@ -276,9 +285,11 @@ module CodeGenerator.Generator {
             statements.push("\tmethod: \"" + api.httpMethod + "\",");
             statements.push("\turl: \"" + api.relativePath + "\",");
             statements.push("\tdata: {");
-            api.parameterDescriptions.forEach((parameter: CodeDom.ParameterDescription) => {
-                statements.push("\t\t" + parameter.name + ": " + parameter.name + ",")
-            })
+            if (api.parameterDescriptions) {
+                api.parameterDescriptions.forEach((parameter: CodeDom.ParameterDescription) => {
+                    statements.push("\t\t" + parameter.name + ": " + parameter.name + ",")
+                });
+            }
             statements.push("\t}");
             statements.push("};")
 

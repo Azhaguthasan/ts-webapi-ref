@@ -6,6 +6,8 @@ module CodeGenerator.CodeDom {
         baseType: TypeInfo;
         isEnum: boolean;
         isInterface: boolean;
+        isArray: boolean;
+        arrayElementType: CodeDom.TypeInfo;
         typeArguments: Array<TypeInfo>;
         properties: Array<CodeGenerator.CodeDom.PropertyInfo>;
         methods: Array<CodeGenerator.CodeDom.MethodInfo>;
